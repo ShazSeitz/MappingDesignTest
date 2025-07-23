@@ -1,120 +1,400 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Policy Mapper</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-        body { background: #f8f9fa; margin: 0; padding: 0; height: 100vh; display: flex; justify-content: center; align-items: center; }
-        .mobile-frame { width: 375px; height: 812px; background: white; border-radius: 40px; overflow: hidden; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .status-bar { height: 44px; background: white; display: flex; justify-content: space-between; padding: 0 20px; align-items: center; border-bottom: 1px solid #e5e5ea; }
-        .content { padding: 20px; height: calc(100% - 44px); overflow-y: auto; }
-        .card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #e5e5ea; }
-        .btn { display: block; width: 100%; padding: 14px; border-radius: 10px; border: none; margin: 8px 0; font-weight: 500; text-align: center; }
-        .btn-primary { background: #4f46e5; color: white; }
-        .btn-outline { background: white; border: 1px solid #d1d5db; }
-        .btn-group { display: flex; gap: 12px; margin: 16px 0; }
-        .btn-group .btn { margin: 0; }
-        .confidence { display: inline-block; background: rgba(79, 70, 229, 0.1); color: #4f46e5; padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-top: 8px; }
-        .hidden { display: none; }
-        .fade-in { animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Policy Mapper</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    /* iOS-like styling */
+    :root {
+      --ios-blue: #007AFF;
+      --ios-gray: #8E8E93;
+      --ios-light-gray: #F2F2F7;
+      --ios-border: #C6C6C8;
+    }
+    
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    
+    .phone {
+      width: 375px;
+      height: 812px;
+      background: white;
+      border-radius: 40px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    
+    .notch {
+      width: 40%;
+      height: 30px;
+      background: black;
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      border-bottom-left-radius: 15px;
+      border-bottom-right-radius: 15px;
+      z-index: 10;
+    }
+    
+    .screen {
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .status-bar {
+      height: 44px;
+      background: white;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 20px;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    
+    .app-header {
+      padding: 16px;
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+    
+    .app-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0;
+      margin-bottom: 4px;
+    }
+    
+    .app-header p {
+      margin: 0;
+      color: var(--ios-gray);
+      font-size: 15px;
+    }
+    
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 16px;
+    }
+    
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      border: 0.5px solid rgba(0,0,0,0.1);
+    }
+    
+    .input-card {
+      background: var(--ios-light-gray);
+      border: none;
+    }
+    
+    .priority-text {
+      color: var(--ios-gray);
+      font-size: 15px;
+      line-height: 1.4;
+    }
+    
+    .priority-text strong {
+      color: black;
+    }
+    
+    .match-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    
+    .match-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      background: rgba(0, 122, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 12px;
+      color: var(--ios-blue);
+    }
+    
+    .match-title {
+      font-size: 17px;
+      font-weight: 600;
+    }
+    
+    .match-subtitle {
+      font-size: 15px;
+      color: var(--ios-gray);
+      margin: 4px 0 12px 0;
+    }
+    
+    .confidence {
+      display: inline-block;
+      background: rgba(0, 122, 255, 0.1);
+      color: var(--ios-blue);
+      padding: 4px 10px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 10px;
+      border: none;
+      font-size: 17px;
+      font-weight: 600;
+      margin: 8px 0;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .btn-primary {
+      background: var(--ios-blue);
+      color: white;
+    }
+    
+    .btn-outline {
+      background: white;
+      border: 1px solid var(--ios-blue);
+      color: var(--ios-blue);
+    }
+    
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      margin: 16px 0;
+    }
+    
+    .btn-group .btn {
+      flex: 1;
+      margin: 0;
+    }
+    
+    .option-card {
+      border: 1px solid var(--ios-border);
+      border-radius: 10px;
+      padding: 16px;
+      margin: 8px 0;
+    }
+    
+    .option-card h3 {
+      margin: 0 0 4px 0;
+      font-size: 17px;
+    }
+    
+    .option-card p {
+      margin: 0;
+      color: var(--ios-gray);
+      font-size: 15px;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    /* iOS-like animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    /* Home indicator for iPhone */
+    .home-indicator {
+      width: 140px;
+      height: 5px;
+      background: black;
+      border-radius: 3px;
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  </style>
 </head>
 <body>
-    <div class="mobile-frame">
-        <div class="status-bar">
-            <span>9:41</span>
-            <span>📶 🔋</span>
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen">
+      <div class="status-bar">
+        <span>9:41</span>
+        <span>📶 100% 🔋</span>
+      </div>
+      
+      <div class="app-header">
+        <h1>Policy Mapper</h1>
+        <p>Your concerns, mapped to action</p>
+      </div>
+      
+      <div class="content" id="content">
+        <!-- Single Match View -->
+        <div id="single-match-view">
+          <div class="card input-card">
+            <p class="priority-text"><strong>Your input:</strong> "I'm worried about rising housing costs"</p>
+          </div>
+
+          <div class="card fade-in">
+            <div class="match-header">
+              <div class="match-icon">🏠</div>
+              <div>
+                <div class="match-title">Housing Affordability</div>
+                <div class="confidence">92% match</div>
+              </div>
+            </div>
+            <p class="match-subtitle">Policies related to housing costs, rent control, and affordable housing initiatives.</p>
+            
+            <p>Does this match your concern?</p>
+            <div class="btn-group">
+              <button class="btn btn-primary" onclick="handleFeedback('single', true)">Yes, that's right</button>
+              <button class="btn btn-outline" onclick="showMultiMatch()">Not quite</button>
+            </div>
+          </div>
         </div>
-        <div class="content" id="content">
-            <!-- Single Match View -->
-            <div id="single-match-view">
-                <div class="card">
-                    <p><strong>Your input:</strong> "I'm worried about rising housing costs"</p>
-                </div>
-                <div class="card fade-in">
-                    <h3>Housing Affordability</h3>
-                    <p>Policies related to housing costs and rent control</p>
-                    <span class="confidence">92% match</span>
-                    <div class="btn-group">
-                        <button class="btn btn-primary" onclick="handleFeedback('single', true)">👍 Yes</button>
-                        <button class="btn btn-outline" onclick="showMultiMatch()">👎 No</button>
-                    </div>
-                </div>
+
+        <!-- Multiple Matches View -->
+        <div id="multi-match-view" class="hidden">
+          <div class="card input-card">
+            <p class="priority-text"><strong>Your input:</strong> "We need better public transit"</p>
+          </div>
+
+          <div class="card">
+            <p>We found a few possible matches:</p>
+            
+            <div class="option-card" onclick="handleFeedback('multi', 'public_transit')">
+              <h3>Public Transportation</h3>
+              <p>Improving bus and train systems, expanding routes</p>
+              <div class="confidence" style="margin-top: 8px; display: inline-block;">85% match</div>
+            </div>
+            
+            <div class="option-card" onclick="handleFeedback('multi', 'infrastructure')" style="opacity: 0.8;">
+              <h3>Infrastructure</h3>
+              <p>General infrastructure development and maintenance</p>
+              <div class="confidence" style="margin-top: 8px; display: inline-block; background: rgba(142, 142, 147, 0.1); color: var(--ios-gray);">72% match</div>
             </div>
 
-            <!-- Multiple Matches View -->
-            <div id="multi-match-view" class="hidden">
-                <div class="card">
-                    <p><strong>Your input:</strong> "Better public transit"</p>
-                </div>
-                <div class="card">
-                    <p>Which best matches your concern?</p>
-                    <button class="btn btn-outline" onclick="handleFeedback('multi', 'transit')" style="text-align: left; margin: 8px 0; display: block;">
-                        <strong>Public Transportation</strong><br>
-                        <small>Improving bus and train systems</small>
-                        <span class="confidence" style="float: right;">85%</span>
-                    </button>
-                    <button class="btn btn-outline" onclick="handleFeedback('multi', 'infra')" style="text-align: left; margin: 8px 0; display: block;">
-                        <strong>Infrastructure</strong><br>
-                        <small>General development projects</small>
-                        <span class="confidence" style="float: right; background: #f0f0f0; color: #666;">72%</span>
-                    </button>
-                    <button class="btn btn-outline" onclick="showClarification()" style="margin-top: 16px;">None of these</button>
-                </div>
-            </div>
-
-            <!-- Clarification View -->
-            <div id="clarification-view" class="hidden">
-                <div class="card">
-                    <p>🤔 Help us understand better:</p>
-                    <p>What aspect of "better public transit" matters most?</p>
-                    <input type="text" placeholder="Type your clarification..." style="width: 100%; padding: 12px; margin: 12px 0; border: 1px solid #ddd; border-radius: 8px;">
-                    <button class="btn btn-primary" onclick="handleClarification()">Submit</button>
-                </div>
-            </div>
-
-            <!-- Confirmation View -->
-            <div id="confirmation-view" class="hidden">
-                <div class="card" style="text-align: center; padding: 40px 20px;">
-                    <div style="font-size: 48px; margin-bottom: 20px;">✅</div>
-                    <h2>Got it!</h2>
-                    <p>We've mapped your priorities.</p>
-                    <button class="btn btn-primary" onclick="resetDemo()" style="margin-top: 20px;">Start Over</button>
-                </div>
-            </div>
+            <button class="btn btn-outline" style="margin-top: 8px;" onclick="showClarification()">None of these match</button>
+          </div>
         </div>
+
+        <!-- Clarification View -->
+        <div id="clarification-view" class="hidden">
+          <div class="card input-card">
+            <p class="priority-text"><strong>Your input:</strong> "We need better public transit"</p>
+          </div>
+
+          <div class="card">
+            <div class="match-header">
+              <div class="match-icon">🤔</div>
+              <div>
+                <div class="match-title">Help us understand</div>
+              </div>
+            </div>
+            
+            <p>Could you clarify what you mean by "better public transit"?</p>
+            
+            <div style="margin: 20px 0;">
+              <div style="margin-bottom: 16px;">
+                <div style="font-weight: 500; margin-bottom: 8px;">Select what matters most:</div>
+                <select style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--ios-border); font-size: 16px; background: white;">
+                  <option>More frequent service</option>
+                  <option>Expanded routes</option>
+                  <option>Lower fares</option>
+                  <option>Cleaner vehicles</option>
+                  <option>Other (please specify)</option>
+                </select>
+              </div>
+              
+              <div>
+                <div style="font-weight: 500; margin-bottom: 8px;">Additional details (optional):</div>
+                <textarea style="width: 100%; height: 80px; padding: 12px; border-radius: 8px; border: 1px solid var(--ios-border); font-size: 15px; font-family: inherit;" placeholder="Type here..."></textarea>
+              </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="handleClarification()">Submit</button>
+          </div>
+        </div>
+
+        <!-- Confirmation View -->
+        <div id="confirmation-view" class="hidden">
+          <div class="card" style="text-align: center; padding: 60px 20px;">
+            <div style="width: 80px; height: 80px; background: rgba(0, 122, 255, 0.1); border-radius: 40px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px;">
+              <span style="font-size: 40px;">✅</span>
+            </div>
+            <h2 style="font-size: 24px; margin-bottom: 8px;">Got it!</h2>
+            <p style="color: var(--ios-gray); margin-bottom: 32px;">We've mapped your priorities to relevant policy areas.</p>
+            <button class="btn btn-primary" onclick="resetDemo()">Start Over</button>
+          </div>
+        </div>
+      </div>
     </div>
+    <div class="home-indicator"></div>
+  </div>
 
-    <script>
-        function handleFeedback(type, response) {
-            if (type === 'single' && response) {
-                document.getElementById('single-match-view').classList.add('hidden');
-                document.getElementById('confirmation-view').classList.remove('hidden');
-            }
-        }
+  <script>
+    function handleFeedback(type, response) {
+      if (type === 'single' && response) {
+        document.getElementById('single-match-view').classList.add('hidden');
+        document.getElementById('confirmation-view').classList.remove('hidden');
+        document.getElementById('confirmation-view').classList.add('fade-in');
+      }
+    }
 
-        function showMultiMatch() {
-            document.getElementById('single-match-view').classList.add('hidden');
-            document.getElementById('multi-match-view').classList.remove('hidden');
-        }
+    function showMultiMatch() {
+      document.getElementById('single-match-view').classList.add('hidden');
+      document.getElementById('multi-match-view').classList.remove('hidden');
+      document.getElementById('multi-match-view').classList.add('fade-in');
+    }
 
-        function showClarification() {
-            document.getElementById('multi-match-view').classList.add('hidden');
-            document.getElementById('clarification-view').classList.remove('hidden');
-        }
+    function showClarification() {
+      document.getElementById('multi-match-view').classList.add('hidden');
+      document.getElementById('clarification-view').classList.remove('hidden');
+      document.getElementById('clarification-view').classList.add('fade-in');
+    }
 
-        function handleClarification() {
-            document.getElementById('clarification-view').classList.add('hidden');
-            document.getElementById('confirmation-view').classList.remove('hidden');
-        }
+    function handleClarification() {
+      document.getElementById('clarification-view').classList.add('hidden');
+      document.getElementById('confirmation-view').classList.remove('hidden');
+      document.getElementById('confirmation-view').classList.add('fade-in');
+    }
 
-        function resetDemo() {
-            document.getElementById('confirmation-view').classList.add('hidden');
-            document.getElementById('single-match-view').classList.remove('hidden');
-        }
-    </script>
+    function resetDemo() {
+      // Hide all views
+      document.querySelectorAll('#content > div').forEach(div => {
+        div.classList.add('hidden');
+      });
+      
+      // Show single match view
+      document.getElementById('single-match-view').classList.remove('hidden');
+      document.getElementById('single-match-view').classList.add('fade-in');
+    }
+  </script>
 </body>
 </html>
